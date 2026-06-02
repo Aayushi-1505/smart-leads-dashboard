@@ -1,0 +1,35 @@
+services:
+  client:
+    build: .
+    container_name: smart-leads-client
+    environment:
+      VITE_API_URL: http://localhost:5000/api
+      VITE_USE_MOCKS: "false"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+
+  server:
+    build: ./server
+    container_name: smart-leads-server
+    env_file:
+      - .env
+    environment:
+      MONGO_URI: mongodb://mongo:27017/smart-leads-dashboard
+      CLIENT_URL: http://localhost:5173
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7
+    container_name: smart-leads-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
