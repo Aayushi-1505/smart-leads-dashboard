@@ -20,15 +20,20 @@ app.use("/api/leads", leadRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
+// Start listening immediately so the port is open and Render deployment detects it
+app.listen(env.port, () => {
+  console.log(`Server running on port ${env.port}`);
+});
+
+// Connect to MongoDB in the background
 connectDB()
   .then(() => {
-    app.listen(env.port, () => {
-      console.log(`Server running on port ${env.port}`);
-    });
+    console.log("MongoDB connected successfully");
   })
   .catch((error) => {
-    console.error("Database connection failed", error);
-    process.exit(1);
+    console.error("Database connection failed:", error);
+    // Do not call process.exit(1) to allow the server to remain online
+    // and respond to health checks, making debugging and deployment easier.
   });
 
 export default app;
